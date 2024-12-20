@@ -52,8 +52,8 @@ def register():
                             
                             # Simpan user baru ke tabel users
                             cursor.execute(''' 
-                                INSERT INTO users (name, email, password, role)
-                                VALUES (?, ?, ?, ?)
+                                INSERT INTO users (name, email, password)
+                                VALUES (?, ?, ?)
                             ''', (name, email, hashed_password, role))
                             
                             conn.commit()
