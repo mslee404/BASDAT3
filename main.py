@@ -18,10 +18,10 @@ if conn:
     cursor = conn.cursor()
     
     # Retrieve the top 3 countries by population
-    cursor.execute('select TOP 5 * from genre_types')
+    cursor.execute('select TOP 5 * from fix_productioncompanytype')
     
     # Define headers
-    headers = ["Genre Type ID", "Genre Name"]
+    headers = ["id", "name"]
     
     # Fetch all rows and display with tabulate
     rows = cursor.fetchall()
