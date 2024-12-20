@@ -54,7 +54,7 @@ def register():
                             cursor.execute(''' 
                                 INSERT INTO users (name, email, password)
                                 VALUES (?, ?, ?)
-                            ''', (name, email, hashed_password, role))
+                            ''', (name, email, hashed_password))
                             
                             conn.commit()
                             flash('Registration successful! You can now log in.', 'success')
