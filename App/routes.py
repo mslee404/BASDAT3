@@ -18,60 +18,6 @@ def register():
         email = request.form['email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
-        role = request.form['role']
-        
-        # Validate form inputs
-        if not name or not email or not password:
-            flash('Please fill in all fields.', 'danger')
-        elif password != confirm_password:
-            flash('Passwords do not match.', 'danger')
-        else:
-            # Create a database connection
-            conn = create_connection()
-            
-            if conn:
-                try:
-                    cursor = conn.cursor()
-                    
-                    # Check if the email is in the allowed list
-                    cursor.execute('SELECT email FROM allowed_emails WHERE email = ?', (email,))
-                    allowed_email = cursor.fetchone()
-                    
-                    if not allowed_email:
-                        flash('This email is not allowed to register.', 'danger')
-                    else:
-                        # Hash the password
-                        hashed_password = generate_password_hash(password)
-                        
-                        # Insert the new user into the database
-                        cursor.execute('''
-                            INSERT INTO users (name, email, password, role)
-                            VALUES (?, ?, ?, ?)
-                        ''', (name, email, hashed_password, role))
-                        
-                        # Commit changes and close the connection
-                        conn.commit()
-                        flash('Registration successful! You can now log in.', 'success')
-                        return redirect(url_for('routes.login'))  # Redirect to login page
-                except Exception as e:
-                    flash(f'Error: {str(e)}', 'danger')
-                finally:
-                    cursor.close()
-                    conn.close()
-            else:
-                flash('Database connection failed.', 'danger')
-    
-    # Render the registration form
-    return render_template('register.html')
-
-# Display the login page
-@routes.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
         
         # Validasi input form
         if not name or not email or not password:
@@ -86,12 +32,12 @@ def register():
                 try:
                     cursor = conn.cursor()
                     
-                    # Cek apakah email ada di tabel allowed_emails
-                    cursor.execute('SELECT role FROM allowed_emails WHERE email = ?', (email,))
+                    # Cek apakah email ada di tabel email_role
+                    cursor.execute('SELECT role FROM email_role WHERE email = ?', (email,))
                     allowed_email = cursor.fetchone()
                     
                     if allowed_email:
-                        # Dapatkan role dari tabel allowed_emails
+                        # Dapatkan role dari tabel email_role
                         role = allowed_email[0]
                         
                         # Hash password
@@ -107,7 +53,7 @@ def register():
                         flash('Registration successful! You can now log in.', 'success')
                         return redirect(url_for('routes.login'))
                     else:
-                        # Jika email tidak ditemukan di allowed_emails
+                        # Jika email tidak ditemukan di email_role
                         flash('This email is not allowed to register.', 'danger')
                 
                 except Exception as e:
@@ -119,6 +65,51 @@ def register():
                 flash('Database connection failed.', 'danger')
     
     return render_template('register.html')
+
+# Display the login page
+@routes.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Validasi input form
+        if not email or not password:
+            flash('Please fill in all fields.', 'danger')
+        else:
+            # Buat koneksi ke database
+            conn = create_connection()
+            
+            if conn:
+                try:
+                    cursor = conn.cursor()
+                    
+                    # Cek apakah email ada di tabel users
+                    cursor.execute('SELECT email, password FROM users WHERE email = ?', (email,))
+                    user = cursor.fetchone()
+                    
+                    if user:
+                        # Cek password
+                        stored_password = user[1]
+                        if check_password_hash(stored_password, password):
+                            # Login berhasil, simpan email ke session
+                            session['email'] = email
+                            flash('Login successful!', 'success')
+                            return redirect(url_for('routes.home'))
+                        else:
+                            flash('Invalid password.', 'danger')
+                    else:
+                        flash('Email not registered.', 'danger')
+                
+                except Exception as e:
+                    flash(f'Error: {str(e)}', 'danger')
+                finally:
+                    cursor.close()
+                    conn.close()
+            else:
+                flash('Database connection failed.', 'danger')
+    
+    return render_template('login.html')
 
 # Logout the user
 @routes.route('/logout')
