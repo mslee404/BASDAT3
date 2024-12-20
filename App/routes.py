@@ -31,30 +31,36 @@ def register():
             if conn:
                 try:
                     cursor = conn.cursor()
+
+                    # Cek apakah email sudah terdaftar di tabel users
+                    cursor.execute('SELECT email FROM users WHERE email = ?', (email,))
+                    existing_user = cursor.fetchone()
                     
-                    # Cek apakah email ada di tabel email_role
-                    cursor.execute('SELECT role FROM email_role WHERE email = ?', (email,))
-                    allowed_email = cursor.fetchone()
-                    
-                    if allowed_email:
-                        # Dapatkan role dari tabel email_role
-                        role = allowed_email[0]
-                        
-                        # Hash password
-                        hashed_password = generate_password_hash(password)
-                        
-                        # Simpan user baru ke tabel users
-                        cursor.execute('''
-                            INSERT INTO users (name, email, password, role)
-                            VALUES (?, ?, ?, ?)
-                        ''', (name, email, hashed_password, role))
-                        
-                        conn.commit()
-                        flash('Registration successful! You can now log in.', 'success')
-                        return redirect(url_for('routes.login'))
+                    if existing_user:
+                        flash('Email is already registered.', 'danger')
                     else:
-                        # Jika email tidak ditemukan di email_role
-                        flash('This email is not allowed to register.', 'danger')
+                        # Cek apakah email ada di tabel email_role
+                        cursor.execute('SELECT role FROM email_role WHERE email = ?', (email,))
+                        allowed_email = cursor.fetchone()
+                        
+                        if allowed_email:
+                            # Dapatkan role dari tabel email_role
+                            role = allowed_email[0]
+                            
+                            # Hash password
+                            hashed_password = generate_password_hash(password)
+                            
+                            # Simpan user baru ke tabel users
+                            cursor.execute(''' 
+                                INSERT INTO users (name, email, password, role)
+                                VALUES (?, ?, ?, ?)
+                            ''', (name, email, hashed_password, role))
+                            
+                            conn.commit()
+                            flash('Registration successful! You can now log in.', 'success')
+                            return redirect(url_for('routes.login'))
+                        else:
+                            flash('This email is not allowed to register.', 'danger')
                 
                 except Exception as e:
                     flash(f'Error: {str(e)}', 'danger')

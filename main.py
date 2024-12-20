@@ -1,35 +1,23 @@
-import logging
-import sys
-from connect import create_connection
-from tabulate import tabulate
+from flask import Flask
+from app.routes import routes
+from dotenv import load_dotenv
+import os
 
-# Configure logging to console
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    stream=sys.stdout,
-    format='%(levelname)s: %(message)s',
-    level=logging.DEBUG
-)
+def create_app():
+    # Load the environment variables from .env file
+    load_dotenv()
 
-# Establish a database connection
-conn = create_connection()
+    # Create the Flask app
+    app = Flask(__name__, template_folder='app/template')
 
-if conn:
-    cursor = conn.cursor()
-    
-    # Retrieve the top 3 countries by population
-    cursor.execute('select TOP 5 * from fix_productioncompanytype')
-    
-    # Define headers
-    headers = ["id", "name"]
-    
-    # Fetch all rows and display with tabulate
-    rows = cursor.fetchall()
-    print(tabulate(rows, headers=headers, tablefmt="grid"))
-    
-    # Close cursor and connection
-    cursor.close()
-    conn.close()
+    # Set the secret key using an environment variable
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-else:
-    logger.error('Failed to connect to the SQL Server database.')
+    # Register the routes blueprint
+    app.register_blueprint(routes)
+
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True)
