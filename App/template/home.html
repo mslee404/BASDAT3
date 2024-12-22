@@ -23,7 +23,7 @@
         <p class="text-center mb-5">Search for TV Shows or Writers and explore detailed information about them.</p>
         
         <!-- Search Bar -->
-        <form action="/viewShow" method="get" id="searchForm">
+        <form action="{{ url_for('routes.search_show')}}" method="POST" id="searchForm">
           <div class="input-group mb-4">
             <input type="text" class="form-control" placeholder="Search TV Shows..." name="queryShow" id="queryShow" aria-describedby="searchShow">
             <button class="btn btn-primary" type="submit">Search</button>

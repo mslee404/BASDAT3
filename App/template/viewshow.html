@@ -1,93 +1,287 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>TV SHOWS - Continent</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Show Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #007bff;
+        }
+        table th, table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .card {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f1f1f1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .card-body {
+            background-color: #e9ecef;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 5px;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table-responsive {
+            margin-top: 15px;
+        }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  </head>
-  <body>
-    
-    <header>
-      <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/home">TV SHOWS</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <a class="nav-link" href="/home">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/logout">Logout</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
+        /* Flexbox for Overview - Ensure it stays in one line or wraps */
+        .overview {
+            display: flex;
+            flex-wrap: wrap;  /* Allows wrapping to new line if space is tight */
+            gap: 10px;  /* Space between overview elements */
+        }
+        .overview p {
+            flex-shrink: 0; /* Prevent paragraph from shrinking */
+            max-width: 300px; /* Max width per overview item */
+            white-space: nowrap; /* Prevent text from wrapping within itself */
+            overflow: hidden; /* Hide overflowed text */
+            text-overflow: ellipsis; /* Display ellipsis for overflowed text */
+        }
 
-    <main>
-      <div class="container mt-5">
-        <h1 class="text-center text-primary mb-4">Search result for: </h1>
-        <p class="text-center mb-5">Discover the diverse continents and their geographical features.</p>
+        @media (max-width: 768px) {
+            table th, table td {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Show Details</h1>
+        <p><strong>Tconst:</strong> {{ queryShow }}</p>
+        <p><strong>Role:</strong> {{ role }}</p>
 
-        <a href="/continent/create" class="btn btn-primary mb-4">Create a New Continent</a>
-
-        <!-- Display messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="mb-4">
-              {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                  <strong>{{ message }}</strong>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-              {% endfor %}
+        <!-- Basic Info Section (Includes Overview) -->
+        <div class="card">
+            <div class="card-header">Basic Information</div>
+            <div class="card-body">
+                {% if overview %}
+                    <div class="overview">
+                        {% for line in overview %}
+                            <p>{{ line }}</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No overview available.</p>
+                {% endif %}
+                
+                {% if basic %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    {% for column in basic[0].keys() %}
+                                    <th>{{ column }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in basic %}
+                                <tr>
+                                    {% for value in row.values() %}
+                                    <td>{{ value }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No basic information available.</p>
+                {% endif %}
             </div>
-          {% endif %}
-        {% endwith %}
+        </div>
 
-        {% if continents %}
-          
-          <table class="table table-striped table-hover table-bordered">
-            <thead class="table-primary">
-              <tr>
-                <th>Continent Name</th>
-                <th>Area</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for continent in continents %}
-                <tr>
-                  <td>{{ continent.Name }}</td>
-                  <td>{{ continent.Area }}</td>
-                  <td>
-                    <!-- Update Button -->
-                    <a href="/continent/update/{{ continent.Name }}" class="btn btn-warning btn-sm">Update</a>
-                    <!-- Delete Button -->
-                    <form action="/continent/delete/{{ continent.Name }}" method="POST" class="d-inline">
-                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this continent?');">Delete</button>
-                    </form>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <p class="text-center">No continent found.</p>
+        <!-- Akas -->
+        <div class="card">
+            <div class="card-header">Alternate Titles (Akas)</div>
+            <div class="card-body">
+                {% if akas %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    {% for column in akas[0].keys() %}
+                                    <th>{{ column }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in akas %}
+                                <tr>
+                                    {% for value in row.values() %}
+                                    <td>{{ value }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No alternate titles available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Genres -->
+        <div class="card">
+            <div class="card-header">Genres</div>
+            <div class="card-body">
+                {% if genres %}
+                    <ul>
+                        {% for genre in genres %}
+                        <li>{{ genre.genreName }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No genres available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Directors -->
+        <div class="card">
+            <div class="card-header">Directors</div>
+            <div class="card-body">
+                {% if directors %}
+                    <ul>
+                        {% for director in directors %}
+                        <li>{{ director.primaryName }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No directors available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Writers -->
+        <div class="card">
+            <div class="card-header">Writers</div>
+            <div class="card-body">
+                {% if writers %}
+                    <ul>
+                        {% for writer in writers %}
+                        <li>{{ writer.primaryName }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No writers available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Role-Specific Data -->
+        {% if role == 'eksekutif' %}
+        <div class="card">
+            <div class="card-header">Air Dates</div>
+            <div class="card-body">
+                {% if airdates %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Is First</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for airdate in airdates %}
+                                <tr>
+                                    <td>{{ airdate.isFirst }}</td>
+                                    <td>{{ airdate.date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No air dates available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Links</div>
+            <div class="card-body">
+                {% if links %}
+                    <ul>
+                        {% for link in links %}
+                        <li>{{ link.link_type }}: <a href="{{ link.link }}" target="_blank">{{ link.link }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No links available.</p>
+                {% endif %}
+            </div>
+        </div>
         {% endif %}
 
-    </main>
-    
-    <footer class="bg-primary text-light text-center p-3 mt-5 shadow-sm">
-      <p>&copy; 2024 Sistem Mondial</p>
-    </footer>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  </body>
+        {% if role == 'produser' %}
+        <div class="card">
+            <div class="card-header">Languages</div>
+            <div class="card-body">
+                {% if language %}
+                    <ul>
+                        {% for lang in language %}
+                        <li>{{ lang.language_name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No language information available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Spoken Languages</div>
+            <div class="card-body">
+                {% if spokenlanguage %}
+                    <ul>
+                        {% for sl in spokenlanguage %}
+                        <li>{{ sl.spoken_language_name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No spoken language information available.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('routes.home') }}" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+</body>
 </html>
