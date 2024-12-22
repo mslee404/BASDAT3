@@ -162,10 +162,12 @@ def viewshow(queryShow):
                 # Lakukan hal yang sama untuk tabel-tabel lainnya...
                 cursor.execute('SELECT * FROM fix_titleakas WHERE tconst = ?', (queryShow,))
                 akas = cursor.fetchall()
+                episode_columns = [desc[0] for desc in cursor.description]
                 akas_dict = [dict(zip(column_names, row)) for row in akas]
 
                 cursor.execute('SELECT * FROM fix_titleepisode WHERE tconst = ?', (queryShow,))
                 episode = cursor.fetchall()
+                episode_columns = [desc[0] for desc in cursor.description]
                 episode_dict = [dict(zip(column_names, row)) for row in episode]
 
                 cursor.execute(''' 
