@@ -152,8 +152,8 @@ def viewshow(queryShow):
                 basic = cursor.fetchall()
 
                 # Perbaiki pengambilan nama kolom dengan cursor.description
-                column_names = [desc[0] for desc in cursor.description]
-                basic_dict = [dict(zip(column_names, row)) for row in basic]
+                basic_columns = [desc[0] for desc in cursor.description]
+                basic_dict = [dict(zip(basic_columns, row)) for row in basic]
 
                 # Debugging: Cek hasil query
                 if not basic_dict:
@@ -162,13 +162,13 @@ def viewshow(queryShow):
                 # Lakukan hal yang sama untuk tabel-tabel lainnya...
                 cursor.execute('SELECT * FROM fix_titleakas WHERE tconst = ?', (queryShow,))
                 akas = cursor.fetchall()
-                episode_columns = [desc[0] for desc in cursor.description]
-                akas_dict = [dict(zip(column_names, row)) for row in akas]
+                akas_columns = [desc[0] for desc in cursor.description]
+                akas_dict = [dict(zip(akas_columns, row)) for row in akas]
 
                 cursor.execute('SELECT * FROM fix_titleepisode WHERE tconst = ?', (queryShow,))
                 episode = cursor.fetchall()
                 episode_columns = [desc[0] for desc in cursor.description]
-                episode_dict = [dict(zip(column_names, row)) for row in episode]
+                episode_dict = [dict(zip(episode_columns, row)) for row in episode]
 
                 cursor.execute(''' 
                     SELECT pc.tconst, pct.companyName
