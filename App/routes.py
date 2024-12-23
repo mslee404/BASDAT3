@@ -180,9 +180,7 @@ def viewshow(queryShow):
                 akas_dict = [dict(zip(akas_columns, row)) for row in akas]
 
                 cursor.execute('SELECT * FROM fix_titleepisode WHERE parentTconst = ?', (queryShow,))
-                episode = cursor.fetchall()
-                episode_columns = [desc[0] for desc in cursor.description]
-                episode_dict = [dict(zip(episode_columns, row)) for row in episode]
+                episode = cursor.fetchall
 
                 cursor.execute(''' 
                     SELECT pc.tconst, pct.companyName
