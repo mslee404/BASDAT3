@@ -197,21 +197,20 @@
                       <table class="table table-bordered">
                           <thead>
                               <tr>
-                                  {% for column in episode[0].keys() %}
-                                  <th>{{ column }}</th>
-                                  {% endfor %}
+                                  <th>ID</th>
+                                  <th>Season Number</th>
+                                  <th>Episode Number</th>
                               </tr>
                           </thead>
                           <tbody>
-                              {% for row in episode %}
-                              <tr>
-                                  {% for value in row.values() %}
-                                  {% if value == '\\N' %}
-                                  <td>None</td>
-                                  {% endif %}
-                                  {% endfor %}
-                              </tr>
-                              {% endfor %}
+                             {% for eps in episode %}
+                                <tr>
+                                    <td> {{ eps.tconst }} </td>
+                                    <td> {{ eps.parentTconst }} </td>
+                                    <td> {{ eps.seasonNumber }} </td>
+                                    <td> {{ eps.episodeNumber }} </td>
+                                </tr>
+                             {% endfor %}
                           </tbody>
                       </table>
                   </div>
@@ -310,7 +309,7 @@
                                   {% endif %}
                                   {% if role == 'produser' %}
                                     <td>
-                                      <form action="/viewshow/deleteprincipal/{{ princ.tconst }}/{{ princ.ordering }}" method="POST" class="d-inline">
+                                      <form action="{{ url_for('routes.delete_principal', tconst=princ.tconst, ordering=princ.ordering, queryShow=queryShow) }}" method="POST" class="d-inline">
                                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this principal?');">Delete</button>
                                       </form>
                                     </td>

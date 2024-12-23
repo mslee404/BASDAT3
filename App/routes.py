@@ -223,7 +223,7 @@ def viewshow(queryShow):
                 productioncountry = cursor.fetchall()
 
                 cursor.execute(''' 
-                    SELECT sg.tconst, g.genreName 
+                    SELECT distinct sg.tconst, g.genreName 
                     FROM fix_showgenre sg 
                     JOIN fix_genre g 
                     ON sg.genreID = g.genreID 
@@ -365,7 +365,7 @@ def viewperson(queryPerson):
 
         return redirect(url_for('routes.home'))
 
-@routes.route('/viewshow/deleteprincipal/<tconst>/<ordering>', methods=['POST'])
+@routes.route('/deleteprincipal/<tconst><ordering>', methods=['POST'])
 def delete_principal(tconst, ordering):
     if 'email' in session:
         queryShow = request.args.get('queryShow')
@@ -374,7 +374,7 @@ def delete_principal(tconst, ordering):
         if conn:
             cursor = conn.cursor()
             try:
-                cursor.execute('DELETE FROM fix_titleprincipal WHERE tconst = ? AND ordering = ?', (tconst, ordering))
+                cursor.execute('DELETE FROM fix_titleprincipal WHERE tconst = ? AND ordering = ?', (tconst, ordering,))
                 conn.commit()  # Commit the transaction
                 
                 # Redirect to the continent list with a success message
