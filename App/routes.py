@@ -180,7 +180,7 @@ def viewshow(queryShow):
                 akas_dict = [dict(zip(akas_columns, row)) for row in akas]
 
                 cursor.execute('SELECT * FROM fix_titleepisode WHERE parentTconst = ?', (queryShow,))
-                episode = cursor.fetchall
+                episode = cursor.fetchall()
 
                 cursor.execute(''' 
                     SELECT pc.tconst, pct.companyName
@@ -193,8 +193,8 @@ def viewshow(queryShow):
 
                 cursor.execute('SELECT tp.ordering, nb.primaryName, tp.category, tp.job, tp.characters FROM fix_titleprincipal tp JOIN fix_namebasic nb ON tp.nconst = nb.nconst WHERE tp.tconst = ?', (queryShow,))
                 principals = cursor.fetchall()
-                episode_columns = [desc[0] for desc in cursor.description]
-                episode_dict = [dict(zip(episode_columns, row)) for row in episode]
+                principals_columns = [desc[0] for desc in cursor.description]
+                principals_dict = [dict(zip(principals_columns, row)) for row in principals]
 
                 cursor.execute(''' 
                     SELECT tp.ordering, nb.primaryName, tp.category, tp.job, tp.characters
@@ -290,7 +290,7 @@ def viewshow(queryShow):
                     role=role,
                     basic=basic_dict,
                     akas=akas_dict,
-                    episode=episode_dict,
+                    episode=episode,
                     productioncompany=productioncompany,
                     productioncountry=productioncountry,
                     rating=rating,
