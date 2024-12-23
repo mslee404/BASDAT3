@@ -267,10 +267,10 @@ def viewshow(queryShow):
 
                 if role == 'produser':
                     cursor.execute(''' 
-                        SELECT lt.languageType, l.tconst 
+                        SELECT lt.languageType, l.tconst,lt.languageTypeID
                         FROM fix_language l 
                         JOIN fix_languagetype lt 
-                        ON l.languageID = lt.languageID 
+                        ON l.languageTypeID = lt.languageTypeID 
                         WHERE l.tconst = ? 
                     ''', (queryShow,))
                     language = cursor.fetchall()
@@ -377,6 +377,32 @@ def delete_principal(tconst, ordering):
                 
                 # Redirect to the continent list with a success message
                 flash('Principal deleted successfully!', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()  # Ensure the connection is closed
+        else:
+            flash('Error: Unable to connect to the database.', 'danger')
+        
+        return redirect(url_for('routes.viewshow', queryShow=queryShow))
+    else:
+        return redirect(url_for('routes.login'))
+
+@routes.route('/deletelanguage/<tconst>/<languageTypeID>', methods=['POST'])
+def delete_language(tconst, languageTypeID):
+    if 'email' in session:
+        queryShow = request.args.get('queryShow','')
+        conn = create_connection()
+        
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute('DELETE FROM fix_language WHERE tconst = ? AND languageTypeID = ?', (tconst, languageTypeID,))
+                conn.commit()  # Commit the transaction
+                
+                # Redirect to the continent list with a success message
+                flash('Language deleted successfully!', 'success')
             except Exception as e:
                 flash(f'Error: {str(e)}', 'danger')
             finally:

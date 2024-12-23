@@ -422,11 +422,26 @@
             <div class="card-header">Languages</div>
             <div class="card-body">
                 {% if language %}
-                    <ul>
-                        {% for lang in language %}
-                        <li>{{ lang.language_name }}</li>
-                        {% endfor %}
-                    </ul>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Language Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for langty in language %}
+                            <tr>
+                                <td>{{ langty.languageType }}</td>
+                                <td><form action="{{ url_for('routes.delete_language', tconst=langty.tconst, languageTypeID=langty.languageTypeID, queryShow=queryShow) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this language?');">Delete</button>
+                                </form></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>   
                 {% else %}
                     <p>No language information available.</p>
                 {% endif %}
