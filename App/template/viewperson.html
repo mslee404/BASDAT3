@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Show Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #007bff;
+        }
+        table th, table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .card {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f1f1f1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .card-body {
+            background-color: #e9ecef;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 5px;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table-responsive {
+            margin-top: 15px;
+        }
+
+        /* Flexbox for Overview - Ensure it stays in one line or wraps */
+        .overview {
+            display: flex;
+            flex-wrap: wrap;  /* Allows wrapping to new line if space is tight */
+            gap: 10px;  /* Space between overview elements */
+        }
+        .overview p {
+            flex-shrink: 0; /* Prevent paragraph from shrinking */
+            max-width: 300px; /* Max width per overview item */
+            white-space: nowrap; /* Prevent text from wrapping within itself */
+            overflow: hidden; /* Hide overflowed text */
+            text-overflow: ellipsis; /* Display ellipsis for overflowed text */
+        }
+
+        @media (max-width: 768px) {
+            table th, table td {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Person Details</h1>
+        <p><strong>Nconst:</strong> {{ queryPerson }}</p>
+        <p><strong>Role:</strong> {{ role }}</p>
+
+        <!-- Basic Info Section (Includes Overview) -->
+        <div class="card">
+            <div class="card-header">Basic Information</div>
+            <div class="card-body">
+                {% if namebasic %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <th>Name</th>
+                                <th>Birth Year</th>
+                                <th>Death Year</th>
+                            </thead>
+                            <tbody>
+                                {% for nb in namebasic %}
+                                <tr>
+                                    <td>{{ nb.primaryName }}</td>
+                                    {% if nb.birthYear == '\\N' %}
+                                    <td>No information</td>
+                                    {% endif %}
+                                    {% if nb.deathYear == '\\N' %}
+                                    <td>No information</td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No basic information available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- primary profession -->
+        <div class="card">
+            <div class="card-header">Primary Profession</div>
+            <div class="card-body">
+                {% if primaryprofession %}
+                    <ul>
+                        {% for prim in primaryprofession %}
+                        <li>{{ prim.profession }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No primary profession information available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- knownfortitle -->
+        <div class="card">
+            <div class="card-header">Known for Title</div>
+            <div class="card-body">
+                {% if knownfortitle %}
+                    <ul>
+                        {% for kft in knownfortitle %}
+                        <li>{{ kft.primaryTitle }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No information available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{{ url_for('routes.home') }}" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+</body>
+</html>

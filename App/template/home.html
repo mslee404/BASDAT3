@@ -21,21 +21,15 @@
       <div class="container mt-5">
         <h1 class="text-center text-primary mb-4">Welcome to TV SHOWS</h1>
         <p class="text-center mb-5">Search for TV Shows or Writers and explore detailed information about them.</p>
-        
-        <!-- Search Bar -->
-        <form action="{{ url_for('routes.search_show')}}" method="POST" id="searchForm">
-          <div class="input-group mb-4">
-            <input type="text" class="form-control" placeholder="Search TV Shows..." name="queryShow" id="queryShow" aria-describedby="searchShow">
-            <button class="btn btn-primary" type="submit">Search</button>
-          </div>
-        </form>
-        
+
         {% if role == 'eksekutif' %}
           <p class="text-center">As an Eksekutif, you have access to additional content and management features.</p>
         {% elif role == 'produser' %}
           <p class="text-center">As a Produser, you can view and manage the TV Shows content.</p>
         {% endif %}
-        
+
+        <br>
+
         <!-- Display messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
@@ -49,6 +43,32 @@
             </div>
           {% endif %}
         {% endwith %}
+
+        <h2 class="text-center">Search Show</h2>
+        <br>
+        <!-- Search Bar Show-->
+        <form action="{{ url_for('routes.search_show')}}" method="POST" id="searchFormShow">
+          <div class="input-group mb-4">
+            <input type="text" class="form-control" placeholder="Search TV Shows..." name="queryShow" id="queryShow" aria-describedby="searchShow">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </div>
+        </form>
+        <br>
+        <br>
+        <h3 class="text-center">or</h3>
+
+        <br>
+        <br>
+        <h2 class="text-center">Search Person</h2>
+        <br>
+        <!-- Search Bar Person-->
+        <form action="{{ url_for('routes.search_person')}}" method="POST" id="searchFormPerson">
+          <div class="input-group mb-4">
+            <input type="text" class="form-control" placeholder="Search Person name..." name="queryPerson" id="queryPerson" aria-describedby="searchPerson">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </div>
+        </form>
+        
       </div>
     </main>
     

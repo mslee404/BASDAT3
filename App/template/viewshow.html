@@ -64,9 +64,9 @@
         }
         .overview p {
             flex-shrink: 0; /* Prevent paragraph from shrinking */
-            max-width: 300px; /* Max width per overview item */
-            white-space: nowrap; /* Prevent text from wrapping within itself */
-            overflow: hidden; /* Hide overflowed text */
+            max-width: 1023px; /* Max width per overview item */
+            white-space: wrap; /* Prevent text from wrapping within itself */
+            overflow: visible; /* Hide overflowed text */
             text-overflow: ellipsis; /* Display ellipsis for overflowed text */
         }
 
@@ -83,14 +83,43 @@
         <p><strong>Tconst:</strong> {{ queryShow }}</p>
         <p><strong>Role:</strong> {{ role }}</p>
 
-        <!-- Basic Info Section (Includes Overview) -->
+        <!-- Rating -->
+        <div class="card">
+          <div class="card-header">Rating</div>
+          <div class="card-body">
+              {% if rating %}
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Average Rate</th>
+                            <th>Vote Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rate in rating %}
+                        <tr>
+                            <td>{{ rate.averageRate }}</td>
+                            <td>{{ rate.voteCount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+              {% else %}
+                  <p>No information about rating available.</p>
+              {% endif %}
+          </div>
+      </div>
+
+      <!-- Basic Info Section (Includes Overview) -->
         <div class="card">
             <div class="card-header">Basic Information</div>
             <div class="card-body">
-                {% if overview %}
+                {% if basic %}
                     <div class="overview">
-                        {% for line in overview %}
-                            <p>{{ line }}</p>
+                        {% for line in basic %}
+                            <p>{{ line.overview }}</p>
                         {% endfor %}
                     </div>
                 {% else %}
@@ -103,15 +132,19 @@
                             <thead>
                                 <tr>
                                     {% for column in basic[0].keys() %}
+                                    {% if column != 'overview' %}
                                     <th>{{ column }}</th>
+                                    {% endif %}
                                     {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for row in basic %}
                                 <tr>
-                                    {% for value in row.values() %}
+                                    {% for key, value in row.items() %}
+                                    {% if key != 'overview' %}
                                     <td>{{ value }}</td>
+                                    {% endif %}
                                     {% endfor %}
                                 </tr>
                                 {% endfor %}
@@ -154,6 +187,39 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- Episode -->
+        <div class="card">
+          <div class="card-header">Episodes</div>
+          <div class="card-body">
+              {% if episode %}
+                  <div class="table-responsive">
+                      <table class="table table-bordered">
+                          <thead>
+                              <tr>
+                                  {% for column in episode[0].keys() %}
+                                  <th>{{ column }}</th>
+                                  {% endfor %}
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for row in episode %}
+                              <tr>
+                                  {% for value in row.values() %}
+                                  {% if value == '\\N' %}
+                                  <td>None</td>
+                                  {% endif %}
+                                  {% endfor %}
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              {% else %}
+                  <p>No episode available.</p>
+              {% endif %}
+          </div>
+      </div>
 
         <!-- Genres -->
         <div class="card">
@@ -203,6 +269,95 @@
             </div>
         </div>
 
+        <!-- Principals -->
+        <div class="card">
+          <div class="card-header">Principals</div>
+          <div class="card-body">
+              {% if principals %}
+                  <div class="table-responsive">
+                      <table class="table table-bordered">
+                          <thead>
+                              <tr>
+                                  <th>No</th>
+                                  <th>Name</th>
+                                  <th>Category</th>
+                                  <th>Job</th>
+                                  <th>Character</th>
+                                  {% if role == 'produser' %}
+                                  <th>Action</th>
+                                  {% endif %}
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for princ in principals %}
+                              <tr>
+                                  <td>{{ princ.ordering }}</td>
+                                  <td>{{ princ.primaryName }}</td>
+                                  {% if princ.category == '\\N' %}
+                                    <td>None</td>
+                                  {% else %}
+                                    <td>{{ princ.category }}</td>
+                                  {% endif %}
+                                  {% if princ.job == '\\N' %}
+                                    <td>None</td>
+                                  {% else %}
+                                    <td>{{ princ.job }}</td>
+                                  {% endif %}
+                                  {% if princ.characters == '\\N' %}
+                                    <td>None</td>
+                                  {% else %}
+                                    <td>{{ princ.characters }}</td>
+                                  {% endif %}
+                                  {% if role == 'produser' %}
+                                    <td>
+                                      <form action="/viewshow/deleteprincipal/{{ princ.tconst }}/{{ princ.ordering }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this principal?');">Delete</button>
+                                      </form>
+                                    </td>
+                                  {% endif %}
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              {% else %}
+                  <p>No information about principal available.</p>
+              {% endif %}
+          </div>
+      </div>
+
+        <!-- Production company -->
+        <div class="card">
+          <div class="card-header">Production Company</div>
+          <div class="card-body">
+              {% if productioncompany %}
+                  <ul>
+                      {% for prodcom in productioncompany %}
+                      <li>{{ prodcom.companyName }}</li>
+                      {% endfor %}
+                  </ul>
+              {% else %}
+                  <p>No information about poduction company available.</p>
+              {% endif %}
+          </div>
+      </div>
+
+      <!-- Production country -->
+      <div class="card">
+        <div class="card-header">Production Country</div>
+        <div class="card-body">
+            {% if productioncountry %}
+                <ul>
+                    {% for prodcoun in productioncountry %}
+                    <li>{{ prodcoun.prodCountryName }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No information about production country available.</p>
+            {% endif %}
+        </div>
+    </div>
+
         <!-- Role-Specific Data -->
         {% if role == 'eksekutif' %}
         <div class="card">
@@ -228,9 +383,24 @@
                         </table>
                     </div>
                 {% else %}
-                    <p>No air dates available.</p>
+                    <p>No air dates information available.</p>
                 {% endif %}
             </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Networks</div>
+          <div class="card-body">
+              {% if networks %}
+                  <ul>
+                      {% for net in networks %}
+                      <li>{{ net.networkName }}</li>
+                      {% endfor %}
+                  </ul>
+              {% else %}
+                  <p>No network information available.</p>
+              {% endif %}
+          </div>
         </div>
 
         <div class="card">
@@ -239,7 +409,7 @@
                 {% if links %}
                     <ul>
                         {% for link in links %}
-                        <li>{{ link.link_type }}: <a href="{{ link.link }}" target="_blank">{{ link.link }}</a></li>
+                        <li>{{ link.linkTypeName }}: <a href="{{ link.link }}" target="_blank">{{ link.link }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}

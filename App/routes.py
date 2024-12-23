@@ -131,6 +131,20 @@ def search_show():
                 flash(f'Error: {str(e)}', 'danger')
                 return render_template('home.html')
 
+@routes.route('/home/search_person', methods=['GET', 'POST'])
+def search_person():
+    if request.method == 'POST':
+        queryPerson = request.form['queryPerson']
+        conn = create_connection()
+
+        if conn:
+            try:
+                return redirect(url_for('routes.viewperson', queryPerson=queryPerson))
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+                return render_template('home.html')
+
+
 @routes.route('/viewshow/<queryShow>', methods=['GET'])
 def viewshow(queryShow):
     if 'email' in session:
@@ -179,9 +193,24 @@ def viewshow(queryShow):
                 ''', (queryShow,))
                 productioncompany = cursor.fetchall()
 
+                cursor.execute('SELECT tp.ordering, nb.primaryName, tp.category, tp.job, tp.characters FROM fix_titleprincipal tp JOIN fix_namebasic nb ON tp.nconst = nb.nconst WHERE tp.tconst = ?', (queryShow,))
+                principals = cursor.fetchall()
+                episode_columns = [desc[0] for desc in cursor.description]
+                episode_dict = [dict(zip(episode_columns, row)) for row in episode]
+
+                cursor.execute(''' 
+                    SELECT tp.ordering, nb.primaryName, tp.category, tp.job, tp.characters
+                    FROM fix_titleprincipal tp 
+                    JOIN fix_namebasic nb 
+                    ON tp.nconst = nb.nconst
+                    WHERE tp.tconst = ? 
+                ''', (queryShow,))
+                principals = cursor.fetchall()
+
                 cursor.execute('SELECT * FROM fix_rating WHERE tconst = ?', (queryShow,))
                 rating = cursor.fetchall()
 
+                # production country
                 cursor.execute(''' 
                     SELECT pc.tconst, pct.prodCountryName, oct.originCountryName 
                     FROM fix_productioncountry pc 
@@ -220,7 +249,7 @@ def viewshow(queryShow):
                 ''', (queryShow,))
                 writers = cursor.fetchall()
 
-                airdates, links, language, spokenlanguage = [], [], [], []
+                airdates, links, language, spokenlanguage, networks = [], [], [], [], []
 
                 if role == 'eksekutif':
                     cursor.execute('SELECT isFirst, date FROM fix_airdate WHERE tconst = ?', (queryShow,))
@@ -234,6 +263,9 @@ def viewshow(queryShow):
                         WHERE l.tconst = ? 
                     ''', (queryShow,))
                     links = cursor.fetchall()
+
+                    cursor.execute('SELECT nt.networkName FROM fix_network n JOIN fix_networktype nt ON n.networkTypeID = nt.networkTypeID WHERE n.tconst = ?', (queryShow,))
+                    networks = cursor.fetchall()
 
                 if role == 'produser':
                     cursor.execute(''' 
@@ -264,6 +296,8 @@ def viewshow(queryShow):
                     productioncompany=productioncompany,
                     productioncountry=productioncountry,
                     rating=rating,
+                    networks=networks,
+                    principals=principals,
                     genres=genres,
                     directors=directors,
                     writers=writers,
@@ -279,3 +313,80 @@ def viewshow(queryShow):
                 conn.close()
 
         return redirect(url_for('routes.home'))
+
+@routes.route('/viewperson/<queryPerson>', methods=['GET'])
+def viewperson(queryPerson):
+    if 'email' in session:
+        conn = create_connection()
+        role = session.get('role')
+
+        if not queryPerson:
+            flash('No result found', 'warning')
+            return redirect(url_for('routes.home'))
+
+        if conn:
+            try:
+                cursor = conn.cursor()
+
+                # Debugging: Cek nilai queryPerson yang diterima
+                print(f"Query Person: {queryPerson}")
+
+                cursor.execute('SELECT * FROM fix_namebasic WHERE nconst = ?', (queryPerson,))
+                namebasic = cursor.fetchall()
+
+                # Debugging: Cek hasil query
+                if not namebasic:
+                    flash(f'No results found for {queryPerson}', 'warning')
+
+                # Lakukan hal yang sama untuk tabel-tabel lainnya...
+                cursor.execute('SELECT * FROM fix_primaryprofession WHERE nconst = ?', (queryPerson,))
+                primaryprofession = cursor.fetchall()
+                primaryprofession_columns = [desc[0] for desc in cursor.description]
+                primaryprofession_dict = [dict(zip(primaryprofession_columns, row)) for row in primaryprofession]
+
+                cursor.execute('SELECT s.primaryTitle FROM fix_knownfortitle kft JOIN fix_show s ON kft.tconst = s.tconst WHERE nconst = ?', (queryPerson,))
+                knownfortitle = cursor.fetchall()
+                knownfortitle_columns = [desc[0] for desc in cursor.description]
+                knownfortitle_dict = [dict(zip(knownfortitle_columns, row)) for row in knownfortitle]
+
+                return render_template(
+                    'viewperson.html',
+                    queryPerson=queryPerson,
+                    role=role,
+                    namebasic=namebasic,
+                    primaryprofession=primaryprofession,
+                    knownfortitle=knownfortitle,
+                )
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()
+
+        return redirect(url_for('routes.home'))
+
+@routes.route('/viewshow/deleteprincipal/<tconst>/<ordering>', methods=['POST'])
+def delete_principal(tconst, ordering):
+    if 'email' in session:
+        queryShow = request.args.get('queryShow')
+        conn = create_connection()
+        
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute('DELETE FROM fix_titleprincipal WHERE tconst = ? AND ordering = ?', (tconst, ordering))
+                conn.commit()  # Commit the transaction
+                
+                # Redirect to the continent list with a success message
+                flash('Principal deleted successfully!', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()  # Ensure the connection is closed
+        else:
+            flash('Error: Unable to connect to the database.', 'danger')
+        
+        return redirect(url_for('routes.viewshow', queryShow=queryShow))
+    else:
+        return redirect(url_for('routes.login'))
