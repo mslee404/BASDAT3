@@ -363,10 +363,10 @@ def viewperson(queryPerson):
 
         return redirect(url_for('routes.home'))
 
-@routes.route('/deleteprincipal/<tconst><ordering>', methods=['POST'])
+@routes.route('/deleteprincipal/<tconst>/<int:ordering>', methods=['POST'])
 def delete_principal(tconst, ordering):
     if 'email' in session:
-        queryShow = request.args.get('queryShow')
+        queryShow = request.args.get('queryShow','')
         conn = create_connection()
         
         if conn:
