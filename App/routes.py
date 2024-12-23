@@ -197,7 +197,7 @@ def viewshow(queryShow):
                 principals_dict = [dict(zip(principals_columns, row)) for row in principals]
 
                 cursor.execute(''' 
-                    SELECT tp.ordering, nb.primaryName, tp.category, tp.job, tp.characters
+                    SELECT tp.tconst, tp.ordering, nb.primaryName, tp.category, tp.job, tp.characters
                     FROM fix_titleprincipal tp 
                     JOIN fix_namebasic nb 
                     ON tp.nconst = nb.nconst
