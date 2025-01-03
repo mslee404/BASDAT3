@@ -95,19 +95,21 @@
                                 <th>Birth Year</th>
                                 <th>Death Year</th>
                             </thead>
-                            <tbody>
-                                {% for nb in namebasic %}
+                            {% for nb in namebasic %}
                                 <tr>
                                     <td>{{ nb.primaryName }}</td>
                                     {% if nb.birthYear == '\\N' %}
                                     <td>No information</td>
+                                    {% else %}
+                                    <td>{{ nb.birthYear }}</td>
                                     {% endif %}
                                     {% if nb.deathYear == '\\N' %}
                                     <td>No information</td>
+                                    {% else %}
+                                    <td>{{ nb.deathYear }}</td>
                                     {% endif %}
                                 </tr>
                                 {% endfor %}
-                            </tbody>
                         </table>
                     </div>
                 {% else %}

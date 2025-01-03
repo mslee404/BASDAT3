@@ -224,16 +224,38 @@
             <div class="card-header">Genres</div>
             <div class="card-body">
                 {% if genres %}
-                    <ul>
-                        {% for genre in genres %}
-                        <li>{{ genre.genreName }}</li>
-                        {% endfor %}
-                    </ul>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Genre Type</th>
+                                    {% if role == 'produser' %}
+                                    <th>Action</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for gen in genres %}
+                                <tr>
+                                    <td>{{ gen.genreName }}</td>
+                                        {% if role == 'produser' %}
+                                    <td>
+                                        <form action="{{ url_for('routes.delete_genre', tconst=gen.tconst, genreID=gen.genreID, queryShow=queryShow) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this genre?');">Delete</button>
+                                        </form>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 {% else %}
-                    <p>No genres available.</p>
+                    <p>No information about genre available.</p>
                 {% endif %}
             </div>
         </div>
+
 
         <!-- Directors -->
         <div class="card">
@@ -269,71 +291,93 @@
 
         <!-- Principals -->
         <div class="card">
-          <div class="card-header">Principals</div>
-          <div class="card-body">
-              {% if principals %}
-                  <div class="table-responsive">
-                      <table class="table table-bordered">
-                          <thead>
-                              <tr>
-                                  <th>No</th>
-                                  <th>Name</th>
-                                  <th>Category</th>
-                                  <th>Job</th>
-                                  <th>Character</th>
-                                  {% if role == 'produser' %}
-                                  <th>Action</th>
-                                  {% endif %}
-                              </tr>
-                          </thead>
-                          <tbody>
-                              {% for princ in principals %}
-                              <tr>
-                                  <td>{{ princ.ordering }}</td>
-                                  <td>{{ princ.primaryName }}</td>
-                                  {% if princ.category == '\\N' %}
+            <div class="card-header">Principals</div>
+            <div class="card-body">
+                {% if principals %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Job</th>
+                                    <th>Character</th>
+                                    {% if role == 'produser' %}
+                                    <th>Action</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for princ in principals %}
+                                <tr>
+                                    <td>{{ princ.ordering }}</td>
+                                    <td>{{ princ.primaryName }}</td>
+                                    {% if princ.category == '\\N' %}
                                     <td>None</td>
-                                  {% else %}
+                                    {% else %}
                                     <td>{{ princ.category }}</td>
-                                  {% endif %}
-                                  {% if princ.job == '\\N' %}
+                                    {% endif %}
+                                    {% if princ.job == '\\N' %}
                                     <td>None</td>
-                                  {% else %}
+                                    {% else %}
                                     <td>{{ princ.job }}</td>
-                                  {% endif %}
-                                  {% if princ.characters == '\\N' %}
+                                    {% endif %}
+                                    {% if princ.characters == '\\N' %}
                                     <td>None</td>
-                                  {% else %}
+                                    {% else %}
                                     <td>{{ princ.characters }}</td>
-                                  {% endif %}
-                                  {% if role == 'produser' %}
-                                    <form action="{{ url_for('routes.delete_principal', tconst=princ.tconst, ordering=princ.ordering, queryShow=queryShow) }}" method="POST" class="d-inline">
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this principal?');">Delete</button>
-                                    </form>
+                                    {% endif %}
+                                    {% if role == 'produser' %}
+                                    <td>
+                                        <form action="{{ url_for('routes.delete_principal', tconst=princ.tconst, ordering=princ.ordering, queryShow=queryShow) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this principal?');">Delete</button>
+                                        </form>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No information about principal available.</p>
+                {% endif %}
+            </div>
+        </div>
 
-                                    <p>{{ url_for('routes.delete_principal', tconst=princ.tconst, ordering=princ.ordering, queryShow=queryShow) }}</p>
-                                  {% endif %}
-                              </tr>
-                              {% endfor %}
-                          </tbody>
-                      </table>
-                  </div>
-              {% else %}
-                  <p>No information about principal available.</p>
-              {% endif %}
-          </div>
-      </div>
 
         <!-- Production company -->
         <div class="card">
           <div class="card-header">Production Company</div>
           <div class="card-body">
               {% if productioncompany %}
-                  <ul>
-                      {% for prodcom in productioncompany %}
-                      <li>{{ prodcom.companyName }}</li>
-                      {% endfor %}
-                  </ul>
+                  <div class=""table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                {% if role == 'produser'%}
+                                <th>Action</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prodcomp in productioncompany %}
+                            <tr>
+                                <td>{{prodcomp.companyName}}</td>
+                                    {% if role == 'produser' %}
+                                        <td>
+                                            <form action="{{ url_for('routes.delete_companyName', tconst=prodcomp.tconst, companyNameID=prodcomp.companyNameID, queryShow=queryShow) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this production company?');">Delete</button>
+                                            </form>
+                                        </td>
+                                    {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
               {% else %}
                   <p>No information about poduction company available.</p>
               {% endif %}
@@ -345,13 +389,33 @@
         <div class="card-header">Production Country</div>
         <div class="card-body">
             {% if productioncountry %}
-                <ul>
-                    {% for prodcoun in productioncountry %}
-                    <li>{{ prodcoun.prodCountryName }}</li>
-                    {% endfor %}
-                </ul>
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                      <thead>
+                          <tr>
+                              <th>Country Name</th>
+                              {% if role == 'produser'%}
+                              <th>Action</th>
+                              {% endif %}
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for prodcount in productioncountry %}
+                          <tr>
+                                <td>{{prodcount.prodCountryName}}</td>
+                                  {% if role == 'produser' %}
+                                <td><form action="{{ url_for('routes.delete_countryName', tconst=prodcount.tconst, prodCountryID=prodcount.prodCountryID, queryShow=queryShow) }}" method="POST" class="d-inline">
+                                          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this production country?');">Delete</button>
+                                    </form>
+                                </td>
+                                {% endif %}
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
             {% else %}
-                <p>No information about production country available.</p>
+                <p>No information about poduction country available.</p>
             {% endif %}
         </div>
     </div>
@@ -368,6 +432,7 @@
                                 <tr>
                                     <th>Is First</th>
                                     <th>Date</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -375,6 +440,10 @@
                                 <tr>
                                     <td>{{ airdate.isFirst }}</td>
                                     <td>{{ airdate.date }}</td>
+                                    <td><form action="{{ url_for('routes.delete_airdate', tconst=airdate.tconst, isFirst=airdate.isFirst, date=airdate.date, queryShow=queryShow) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this air date?');">Delete</button>
+                                        </form>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -452,16 +521,33 @@
             <div class="card-header">Spoken Languages</div>
             <div class="card-body">
                 {% if spokenlanguage %}
-                    <ul>
-                        {% for sl in spokenlanguage %}
-                        <li>{{ sl.spoken_language_name }}</li>
-                        {% endfor %}
-                    </ul>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Spoken Language Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for spoklang in spokenlanguage %}
+                            <tr>
+                                <td>{{ spoklang.spokenLanguageType }}</td>
+                                <td><form action="{{ url_for('routes.delete_spokenlanguage', tconst=spoklang.tconst, spokenLanguageID=spoklang.spokenLanguageID, queryShow=queryShow) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this spoken language?');">Delete</button>
+                                </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>   
                 {% else %}
                     <p>No spoken language information available.</p>
                 {% endif %}
             </div>
         </div>
+
         {% endif %}
 
         <a href="{{ url_for('routes.home') }}" class="btn btn-primary mt-3">Back to Home</a>

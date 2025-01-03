@@ -183,7 +183,7 @@ def viewshow(queryShow):
                 episode = cursor.fetchall()
 
                 cursor.execute(''' 
-                    SELECT pc.tconst, pct.companyName
+                    SELECT pc.tconst, pct.companyNameID,pct.companyName
                     FROM fix_productioncompany pc 
                     JOIN fix_productioncompanytype pct 
                     ON pc.companyNameID = pct.companyNameID
@@ -210,7 +210,7 @@ def viewshow(queryShow):
 
                 # production country
                 cursor.execute(''' 
-                    SELECT pc.tconst, pct.prodCountryName, oct.originCountryName 
+                    SELECT pc.tconst, pct.prodCountryName, oct.originCountryName, pct.prodCountryID 
                     FROM fix_productioncountry pc 
                     JOIN fix_productioncountrytype pct 
                     ON pc.prodCountryID = pct.prodCountryID 
@@ -221,7 +221,7 @@ def viewshow(queryShow):
                 productioncountry = cursor.fetchall()
 
                 cursor.execute(''' 
-                    SELECT distinct sg.tconst, g.genreName 
+                    SELECT distinct sg.tconst, g.genreName, sg.genreID
                     FROM fix_showgenre sg 
                     JOIN fix_genre g 
                     ON sg.genreID = g.genreID 
@@ -250,7 +250,7 @@ def viewshow(queryShow):
                 airdates, links, language, spokenlanguage, networks = [], [], [], [], []
 
                 if role == 'eksekutif':
-                    cursor.execute('SELECT isFirst, date FROM fix_airdate WHERE tconst = ?', (queryShow,))
+                    cursor.execute('SELECT tconst, isFirst, date FROM fix_airdate WHERE tconst = ?', (queryShow,))
                     airdates = cursor.fetchall()
 
                     cursor.execute(''' 
@@ -276,10 +276,10 @@ def viewshow(queryShow):
                     language = cursor.fetchall()
 
                     cursor.execute(''' 
-                        SELECT sl.tconst, slt.spoken_language_name 
+                        SELECT sl.tconst, slt.spokenLanguageType, slt.spokenLanguageID
                         FROM fix_spokenlanguage sl 
                         JOIN fix_spokenlanguagetype slt 
-                        ON slt.spoken_language_type_id = sl.spokenLanguageID 
+                        ON slt.spokenLanguageID = sl.spokenLanguageID 
                         WHERE sl.tconst = ? 
                     ''', (queryShow,))
                     spokenlanguage = cursor.fetchall()
@@ -403,6 +403,136 @@ def delete_language(tconst, languageTypeID):
                 
                 # Redirect to the continent list with a success message
                 flash('Language deleted successfully!', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()  # Ensure the connection is closed
+        else:
+            flash('Error: Unable to connect to the database.', 'danger')
+        
+        return redirect(url_for('routes.viewshow', queryShow=queryShow))
+    else:
+        return redirect(url_for('routes.login'))
+
+@routes.route('/deletespokenlanguage/<tconst>/<spokenLanguageID>', methods=['POST'])
+def delete_spokenlanguage(tconst, spokenLanguageID):
+    if 'email' in session:
+        queryShow = request.args.get('queryShow','')
+        conn = create_connection()
+        
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute('DELETE FROM fix_spokenlanguage WHERE tconst = ? AND spokenLanguageID = ?', (tconst, spokenLanguageID,))
+                conn.commit()  # Commit the transaction
+                
+                # Redirect to the continent list with a success message
+                flash('Spoken language deleted successfully!', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()  # Ensure the connection is closed
+        else:
+            flash('Error: Unable to connect to the database.', 'danger')
+        
+        return redirect(url_for('routes.viewshow', queryShow=queryShow))
+    else:
+        return redirect(url_for('routes.login'))
+
+@routes.route('/deletecompanyName/<tconst>/<companyNameID>', methods=['POST'])
+def delete_companyName(tconst, companyNameID):
+    if 'email' in session:
+        queryShow = request.args.get('queryShow','')
+        conn = create_connection()
+        
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute('DELETE FROM fix_productioncompany WHERE tconst = ? AND companyNameID = ?', (tconst, companyNameID,))
+                conn.commit()  # Commit the transaction
+                
+                # Redirect to the continent list with a success message
+                flash('Production company deleted successfully!', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()  # Ensure the connection is closed
+        else:
+            flash('Error: Unable to connect to the database.', 'danger')
+        
+        return redirect(url_for('routes.viewshow', queryShow=queryShow))
+    else:
+        return redirect(url_for('routes.login'))
+
+@routes.route('/deletecountryName/<tconst>/<prodCountryID>', methods=['POST'])
+def delete_countryName(tconst, prodCountryID):
+    if 'email' in session:
+        queryShow = request.args.get('queryShow','')
+        conn = create_connection()
+        
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute('DELETE FROM fix_productioncountry WHERE tconst = ? AND prodCountryID = ?', (tconst, prodCountryID,))
+                conn.commit()  # Commit the transaction
+                
+                # Redirect to the continent list with a success message
+                flash('Production country deleted successfully!', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()  # Ensure the connection is closed
+        else:
+            flash('Error: Unable to connect to the database.', 'danger')
+        
+        return redirect(url_for('routes.viewshow', queryShow=queryShow))
+    else:
+        return redirect(url_for('routes.login'))
+
+@routes.route('/deletegenre/<tconst>/<genreID>', methods=['POST'])
+def delete_genre(tconst, genreID):
+    if 'email' in session:
+        queryShow = request.args.get('queryShow','')
+        conn = create_connection()
+        
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute('DELETE FROM fix_showgenre WHERE tconst = ? AND genreID = ?', (tconst, genreID,))
+                conn.commit()  # Commit the transaction
+                
+                # Redirect to the continent list with a success message
+                flash('Genre deleted successfully!', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'danger')
+            finally:
+                cursor.close()
+                conn.close()  # Ensure the connection is closed
+        else:
+            flash('Error: Unable to connect to the database.', 'danger')
+        
+        return redirect(url_for('routes.viewshow', queryShow=queryShow))
+    else:
+        return redirect(url_for('routes.login'))
+
+@routes.route('/deleteairdate/<tconst>/<int:isFirst>/<date>', methods=['POST'])
+def delete_airdate(tconst, isFirst, date):
+    if 'email' in session:
+        queryShow = request.args.get('queryShow','')
+        conn = create_connection()
+        
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute('DELETE FROM fix_airdate WHERE tconst = ? AND isFirst = ? AND date = ?', (tconst, isFirst, date,))
+                conn.commit()  # Commit the transaction
+                
+                # Redirect to the continent list with a success message
+                flash('Air Date deleted successfully!', 'success')
             except Exception as e:
                 flash(f'Error: {str(e)}', 'danger')
             finally:
