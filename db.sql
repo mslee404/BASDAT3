@@ -8,6 +8,8 @@ CREATE TABLE users (
 );
 
 create table email (
-    email varchar(255) primary key
-    [first name] nvarchar(50) 
+    email varchar(255) primary key,
+    [first name] nvarchar(50),
+    [last name] nvarchar(50)
 )
+ 
