@@ -6,3 +6,8 @@ CREATE TABLE users (
     email VARCHAR(50) UNIQUE 
     FOREIGN KEY (email) REFERENCES email_role(email)
 );
+
+create table email (
+    email varchar(255) primary key
+    [first name] nvarchar(50) 
+)
